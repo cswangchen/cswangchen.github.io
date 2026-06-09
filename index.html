@@ -11,7 +11,7 @@
     <main id="loginView" class="login-view">
       <section class="login-panel" aria-labelledby="loginTitle">
         <div class="brand-lockup">
-          <img src="./assets/logo.png" alt="HSBG" />
+          <img src="./assets/logo-red.svg" alt="HSBG" />
           <div>
             <span>HSBG Fund</span>
             <h1 id="loginTitle">巴豐基金客户动态视图</h1>
@@ -57,7 +57,7 @@
     <main id="appView" class="app-view hidden">
       <aside class="side-nav">
         <div class="side-brand">
-          <img src="./assets/logo.png" alt="HSBG" />
+          <img src="./assets/logo-red.svg" alt="HSBG" />
           <div>
             <span>HSBG Fund</span>
             <strong>客户视图</strong>
@@ -77,6 +77,7 @@
           <a href="#holdingsSection">持仓</a>
           <a href="#dividendsSection">分红</a>
           <a href="#lotsSection">份额</a>
+          <a href="#anonymousSubscriptionsSection">匿名加仓</a>
           <a href="#tradesSection">交易</a>
         </nav>
 
@@ -118,7 +119,7 @@
             <div class="panel-heading">
               <div>
                 <p class="eyebrow">NAV</p>
-                <h3 id="navTitle">单位净值走势</h3>
+                <h3 id="navTitle">净值对标曲线</h3>
               </div>
             </div>
             <div id="navChart" class="nav-chart"></div>
@@ -206,6 +207,33 @@
                   </tr>
                 </thead>
                 <tbody id="lotsBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section
+            id="anonymousSubscriptionsSection"
+            class="panel table-panel"
+            aria-labelledby="anonymousSubscriptionsTitle"
+          >
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Anonymous Subscriptions</p>
+                <h3 id="anonymousSubscriptionsTitle">其他客户匿名加仓</h3>
+              </div>
+            </div>
+            <div class="table-wrap compact">
+              <table>
+                <thead>
+                  <tr>
+                    <th>日期</th>
+                    <th>客户</th>
+                    <th>金额</th>
+                    <th>份额</th>
+                    <th>买入净值</th>
+                  </tr>
+                </thead>
+                <tbody id="anonymousSubscriptionsBody"></tbody>
               </table>
             </div>
           </section>

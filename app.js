@@ -279,51 +279,69 @@ function renderMarketSummary(context) {
 }
 
 function renderNavChart() {
-  const points = (DATA?.navHistory || PUBLIC_DATA?.navHistory || []).filter((item) => item.nav > 0).slice(-24);
+  const points = (DATA?.performanceBenchmark || PUBLIC_DATA?.performanceBenchmark || []).filter(
+    (item) => item.fundTotalReturnIndex > 0 && item.weightedBenchmarkIndex > 0,
+  );
   if (!points.length) {
     $("#navChart").innerHTML = "";
     return;
   }
   const width = 640;
-  const height = 230;
+  const height = 260;
   const padX = 36;
   const padTop = 24;
-  const padBottom = 38;
-  const navs = points.map((item) => item.nav);
-  const min = Math.min(...navs);
-  const max = Math.max(...navs);
+  const padBottom = 54;
+  const series = [
+    { key: "fundTotalReturnIndex", label: "基金含分红", className: "benchmark-fund" },
+    { key: "weightedBenchmarkIndex", label: "权重基准", className: "benchmark-index" },
+    { key: "fundPriceIndex", label: "基金净值", className: "benchmark-price" },
+  ];
+  const values = points.flatMap((item) => series.map((serie) => Number(item[serie.key] || 0))).filter(Boolean);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
   const span = max - min || 1;
   const x = (index) => padX + (index / Math.max(points.length - 1, 1)) * (width - padX * 2);
   const y = (value) => padTop + (1 - (value - min) / span) * (height - padTop - padBottom);
-  const line = points.map((item, index) => `${index === 0 ? "M" : "L"} ${x(index)} ${y(item.nav)}`).join(" ");
-  const area = `${line} L ${x(points.length - 1)} ${height - padBottom} L ${x(0)} ${height - padBottom} Z`;
+  const pathFor = (key) =>
+    points.map((item, index) => `${index === 0 ? "M" : "L"} ${x(index)} ${y(Number(item[key] || 0))}`).join(" ");
   const latest = points.at(-1);
   const first = points[0];
   const grid = [0, 0.5, 1]
     .map((ratio) => {
       const gridY = padTop + ratio * (height - padTop - padBottom);
       const value = max - ratio * span;
-      return `<line x1="${padX}" y1="${gridY}" x2="${width - padX}" y2="${gridY}" stroke="#dfe4db"/><text x="${padX}" y="${gridY - 5}" fill="#69736c" font-size="11">${formatNumber(value, 3)}</text>`;
+      return `<line x1="${padX}" y1="${gridY}" x2="${width - padX}" y2="${gridY}" stroke="#dfe4db"/><text x="${padX}" y="${gridY - 5}" fill="#69736c" font-size="11">${formatNumber(value, 1)}</text>`;
     })
     .join("");
   const pointNodes = points
     .map((item, index) => {
-      return `<circle class="nav-point" cx="${x(index)}" cy="${y(item.nav)}" r="4" data-date="${escapeHtml(
+      return `<circle class="nav-point" cx="${x(index)}" cy="${y(item.fundTotalReturnIndex)}" r="4" data-date="${escapeHtml(
         item.date,
-      )}" data-nav="${item.nav}" data-asset="${item.totalAsset || 0}"></circle>`;
+      )}" data-fund="${item.fundTotalReturnIndex}" data-price="${item.fundPriceIndex}" data-benchmark="${
+        item.weightedBenchmarkIndex
+      }" data-excess="${item.excessReturn || 0}"></circle>`;
     })
+    .join("");
+  const lines = series
+    .map((serie) => `<path d="${pathFor(serie.key)}" class="benchmark-line ${serie.className}"></path>`)
+    .join("");
+  const legend = series
+    .map((serie) => `<span class="chart-legend-item ${serie.className}">${escapeHtml(serie.label)}</span>`)
     .join("");
 
   $("#navChart").innerHTML = `
-    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="单位净值走势">
+    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="净值对标曲线">
       ${grid}
-      <path d="${area}" class="nav-area"></path>
-      <path d="${line}" class="nav-line"></path>
+      ${lines}
       ${pointNodes}
       <text x="${padX}" y="${height - 12}" fill="#69736c" font-size="12">${escapeHtml(first.date)}</text>
       <text x="${width - padX}" y="${height - 12}" text-anchor="end" fill="#69736c" font-size="12">${escapeHtml(latest.date)}</text>
-      <text x="${x(points.length - 1) - 8}" y="${y(latest.nav) - 12}" text-anchor="end" fill="#1f2522" font-size="13" font-weight="700">${formatNumber(latest.nav, 4)}</text>
+      <text x="${x(points.length - 1) - 8}" y="${y(latest.fundTotalReturnIndex) - 12}" text-anchor="end" fill="#1f2522" font-size="13" font-weight="700">${formatNumber(
+        latest.fundTotalReturnIndex,
+        1,
+      )}</text>
     </svg>
+    <div class="chart-legend">${legend}</div>
     <div class="nav-tooltip hidden" id="navTooltip"></div>
   `;
 
@@ -333,8 +351,10 @@ function renderNavChart() {
       tooltip.classList.remove("hidden");
       tooltip.innerHTML = `
         <strong>${escapeHtml(point.dataset.date)}</strong>
-        <span>NAV ${formatNumber(point.dataset.nav, 4)}</span>
-        <small>总资产 ${formatCurrency(point.dataset.asset)}</small>
+        <span>基金含分红 ${formatNumber(point.dataset.fund, 2)}</span>
+        <small>权重基准 ${formatNumber(point.dataset.benchmark, 2)}</small>
+        <small>基金净值 ${formatNumber(point.dataset.price, 2)}</small>
+        <small>超额 ${formatPercent(point.dataset.excess, 2)}</small>
       `;
     });
     point.addEventListener("mousemove", (event) => {
@@ -518,6 +538,31 @@ function renderLots(context) {
     .join("");
 }
 
+function renderAnonymousSubscriptions() {
+  const rows = DATA?.anonymousSubscriptions || [];
+  const body = $("#anonymousSubscriptionsBody");
+  if (!body) return;
+  if (!rows.length) {
+    body.innerHTML = `<tr><td colspan="5" class="name-cell">暂无其他客户加仓记录</td></tr>`;
+    return;
+  }
+  body.innerHTML = rows
+    .slice(0, 18)
+    .map((lot) => {
+      const tag = lot.isAsOfDateSubscription ? `<span class="fresh-tag">当日</span>` : "";
+      return `
+        <tr>
+          <td>${escapeHtml(lot.date)}</td>
+          <td class="name-cell">${escapeHtml(lot.label)} ${tag}</td>
+          <td>${formatCurrency(lot.investment)}</td>
+          <td>${formatNumber(lot.shares, 2)}</td>
+          <td>${formatNumber(lot.buyNav, 4)}</td>
+        </tr>
+      `;
+    })
+    .join("");
+}
+
 function renderTrades() {
   $("#tradesBody").innerHTML = DATA.recentTrades
     .slice(0, 28)
@@ -560,6 +605,7 @@ function renderApp() {
   renderHoldings(context);
   renderDividends(context);
   renderLots(context);
+  renderAnonymousSubscriptions();
   renderTrades();
   renderAssumptions();
 }
