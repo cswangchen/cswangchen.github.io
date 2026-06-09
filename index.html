@@ -4,97 +4,151 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="Cache-Control" content="no-store" />
-    <title>HSBG 巴豐基金客户动态视图</title>
-    <link rel="stylesheet" href="./styles.css?v=20260609-asset-reports" />
+    <title>HSBG 巴豐基金客户门户</title>
+    <link rel="icon" href="./assets/logo-red.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css?v=20260609-ui-upgrade" />
   </head>
   <body>
     <main id="loginView" class="login-view">
       <section class="login-panel" aria-labelledby="loginTitle">
-        <div class="brand-lockup">
-          <img src="./assets/logo-red.svg" alt="HSBG" />
-          <div>
-            <span>HSBG Fund</span>
-            <h1 id="loginTitle">巴豐基金客户动态视图</h1>
+        <div class="login-panel-inner">
+          <a class="brand-lockup login-brand" href="/" aria-label="HSBG Fund">
+            <span class="logo-crop">
+              <img src="./assets/logo-red.png" alt="HSBG 巴豐" />
+            </span>
+          </a>
+
+          <div class="login-intro">
+            <span class="eyebrow">Private Client Access</span>
+            <h1 id="loginTitle">巴豐基金客户门户</h1>
+            <p>安全访问您的基金组合、NAV 与持仓表现。</p>
           </div>
+
+          <form id="loginForm" class="login-form" autocomplete="on">
+            <div class="login-card-head">
+              <div>
+                <span class="eyebrow">Secure Sign In</span>
+                <h2>安全登录</h2>
+              </div>
+              <span class="secure-pill">SSL</span>
+            </div>
+
+            <div class="field">
+              <label for="clientIdInput">客户号 / 用户名</label>
+              <input
+                id="clientIdInput"
+                name="username"
+                autocomplete="username"
+                spellcheck="false"
+                placeholder="请输入客户号或用户名"
+              />
+            </div>
+
+            <div class="field">
+              <label for="passwordInput">密码</label>
+              <input
+                id="passwordInput"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="请输入密码"
+              />
+            </div>
+
+            <div class="login-options">
+              <label class="check-line">
+                <input id="rememberClientId" type="checkbox" />
+                <span>记住客户号</span>
+              </label>
+              <button id="forgotPasswordButton" class="link-button" type="button">忘记密码</button>
+            </div>
+
+            <button class="primary-login-button" type="submit">进入客户门户</button>
+            <p id="loginError" class="login-error" role="alert"></p>
+            <p id="loginHint" class="login-hint">SSL 加密连接 · 仅限授权客户访问</p>
+          </form>
+
+          <p class="login-footer">© HSBG Fund. Confidential client access.</p>
         </div>
-
-        <form id="loginForm" class="login-form">
-          <label for="clientIdInput">用户名</label>
-          <div class="login-row single">
-            <input
-              id="clientIdInput"
-              name="username"
-              autocomplete="username"
-              spellcheck="false"
-              placeholder="请输入用户名"
-            />
-          </div>
-
-          <label for="passwordInput">密码</label>
-          <div class="login-row">
-            <input
-              id="passwordInput"
-              name="password"
-              type="password"
-              autocomplete="current-password"
-              placeholder="请输入密码"
-            />
-            <button type="submit">登录</button>
-          </div>
-          <p id="loginError" class="login-error" role="alert"></p>
-        </form>
       </section>
 
-      <section class="login-market" aria-label="收益率前六持仓">
-        <div class="snapshot-top">
-          <div>
-            <span id="loginAsOf">数据日</span>
-            <strong id="loginNav">--</strong>
+      <section class="login-market" aria-label="Portfolio Snapshot">
+        <div class="snapshot-shell">
+          <div class="snapshot-top">
+            <div>
+              <span class="eyebrow">Portfolio Snapshot</span>
+              <h2>客户资产动态预览</h2>
+              <p>Demo Preview · 匿名化展示，不包含客户身份信息。</p>
+            </div>
+            <span class="snapshot-pill">Secure Preview</span>
           </div>
-          <small>持仓收益率 Top 6</small>
+
+          <div class="snapshot-meta">
+            <div>
+              <span id="loginAsOf">数据日 --</span>
+              <strong id="loginNav">NAV --</strong>
+            </div>
+            <small id="loginRefresh">Last refreshed --</small>
+          </div>
+
+          <div class="section-label">
+            <span>持仓收益率 Top 6</span>
+            <small>Top performers by cumulative return</small>
+          </div>
+          <div id="loginTopPerformers" class="login-performer-grid" aria-live="polite"></div>
+
+          <div class="section-label allocation-label">
+            <span>Market Allocation</span>
+            <small>按基金持仓市场分布</small>
+          </div>
+          <div id="loginMarketBars" class="market-bars"></div>
         </div>
-        <div id="loginTopPerformers" class="login-performer-grid"></div>
-        <div id="loginMarketBars" class="market-bars"></div>
       </section>
     </main>
 
     <main id="appView" class="app-view hidden">
-      <aside class="side-nav">
+      <button id="mobileMenuButton" class="mobile-menu-button" type="button" aria-label="打开导航">☰</button>
+      <div id="sideOverlay" class="side-overlay hidden"></div>
+
+      <aside id="sideNav" class="side-nav">
         <div class="side-brand">
-          <img src="./assets/logo-red.svg" alt="HSBG" />
+          <span class="logo-crop small">
+            <img src="./assets/logo-red.png" alt="HSBG 巴豐" />
+          </span>
           <div>
-            <span>HSBG Fund</span>
-            <strong>客户视图</strong>
+            <span>HSBG FUND</span>
+            <strong id="sideViewLabel">客户视图</strong>
           </div>
         </div>
 
-        <div id="vipCard" class="vip-card hidden">
-          <span>Premier</span>
-          <strong>VIP Account</strong>
+        <div id="vipCard" class="identity-card">
+          <span id="identityTier">Client Account</span>
+          <strong id="identityCode">--</strong>
+          <small id="identityMeta">Portfolio access</small>
         </div>
 
         <label class="side-label" for="clientSelect">当前账户</label>
         <select id="clientSelect" class="client-select"></select>
 
         <nav class="section-nav" aria-label="页面区域">
-          <a href="#summarySection">总览</a>
-          <a href="#assetOverviewSection">资产</a>
-          <a href="#assetIncomeSection">收益</a>
+          <a href="#summarySection">资产中心</a>
+          <a href="#assetIncomeSection">走势</a>
+          <a href="#allocationSection">资金分布</a>
           <a href="#holdingsSection">持仓</a>
           <a href="#dividendsSection">分红</a>
           <a href="#lotsSection">份额</a>
-          <a href="#anonymousSubscriptionsSection">匿名加仓</a>
-          <a href="#reportsSection">报告</a>
+          <a href="#anonymousSubscriptionsSection">申购动态</a>
           <a href="#tradesSection">交易</a>
+          <a href="#reportsSection">报告</a>
         </nav>
 
-        <button id="logoutButton" class="ghost-button" type="button">退出</button>
+        <button id="logoutButton" class="logout-button" type="button">退出登录</button>
       </aside>
 
       <section class="workspace">
         <header class="topbar">
           <div>
-            <p class="eyebrow" id="asOfLabel">数据日</p>
+            <p class="eyebrow" id="asOfLabel">数据日 --</p>
             <h2 id="clientTitle">--</h2>
             <span id="tierBadge" class="tier-badge hidden">VIP</span>
           </div>
@@ -104,14 +158,17 @@
               <span>自动刷新</span>
             </label>
             <button id="reloadButton" class="utility-button" type="button">刷新</button>
+            <a class="utility-link" href="#assetIncomeSection">历史收益查询</a>
+            <a class="utility-link" href="#reportsSection">账户报告</a>
             <span id="clockLabel" class="clock-label">--</span>
           </div>
         </header>
 
-        <section id="wealthHero" class="wealth-hero" aria-label="账户欢迎区">
+        <section id="wealthHero" class="wealth-hero" aria-label="账户资产页头">
           <div>
-            <h2 id="welcomeLine">下午好</h2>
-            <p id="heroMeta">最新数据</p>
+            <span class="eyebrow">Client Portfolio Portal</span>
+            <h1 id="welcomeLine">--</h1>
+            <p id="heroMeta">--</p>
           </div>
           <div class="hero-actions">
             <a class="hero-button" href="#assetIncomeSection">历史收益查询</a>
@@ -119,30 +176,36 @@
           </div>
         </section>
 
-        <section id="assetOverviewSection" class="asset-console" aria-labelledby="assetOverviewTitle">
-          <div class="asset-table-card">
-            <div class="asset-head">
-              <h3 id="assetOverviewTitle">资产</h3>
-              <span>总收益</span>
-              <span>日收益</span>
+        <section id="summarySection" class="kpi-grid" aria-label="核心资产指标"></section>
+
+        <section class="console-grid">
+          <section id="assetOverviewSection" class="panel asset-console" aria-labelledby="assetOverviewTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Asset Summary</p>
+                <h3 id="assetOverviewTitle">资产概览</h3>
+              </div>
             </div>
             <div id="assetRows" class="asset-rows"></div>
-          </div>
-          <aside class="tenk-card" aria-labelledby="tenkTitle">
-            <div class="tenk-select">HSBG 巴豐基金</div>
-            <h3 id="tenkTitle">每万份收益</h3>
-            <strong id="tenkTotal">--</strong>
-            <div id="tenkChart" class="mini-chart"></div>
-          </aside>
-        </section>
+          </section>
 
-        <section id="summarySection" class="kpi-grid" aria-label="客户总览"></section>
+          <section class="panel tenk-card" aria-labelledby="tenkTitle">
+            <div class="panel-heading compact-heading">
+              <div>
+                <p class="eyebrow">Income Per 10K Units</p>
+                <h3 id="tenkTitle">每万份收益</h3>
+              </div>
+              <span id="tenkTotal" class="pill">--</span>
+            </div>
+            <div id="tenkChart" class="mini-chart"></div>
+          </section>
+        </section>
 
         <section id="assetIncomeSection" class="panel asset-income-panel" aria-labelledby="assetIncomeTitle">
           <div class="panel-heading asset-income-heading">
             <div>
-              <p class="eyebrow">Asset Income</p>
-              <h3 id="assetIncomeTitle">资产收益图</h3>
+              <p class="eyebrow">Performance</p>
+              <h3 id="assetIncomeTitle">资产与收益走势</h3>
             </div>
             <div id="assetRangeTabs" class="asset-tabs" aria-label="收益图周期">
               <button type="button" class="active" data-range="1m">近一月</button>
@@ -158,11 +221,11 @@
         </section>
 
         <section class="dashboard-grid">
-          <section class="panel panel-wide" aria-labelledby="allocationTitle">
+          <section id="allocationSection" class="panel panel-wide" aria-labelledby="allocationTitle">
             <div class="panel-heading">
               <div>
-                <p class="eyebrow">Market Allocation</p>
-                <h3 id="allocationTitle">市场配置与当日损益</h3>
+                <p class="eyebrow">Allocation</p>
+                <h3 id="allocationTitle">资金分布与当日表现</h3>
               </div>
               <span id="fundDayPnl" class="pill">--</span>
             </div>
@@ -172,41 +235,51 @@
           <section class="panel" aria-labelledby="navTitle">
             <div class="panel-heading">
               <div>
-                <p class="eyebrow">NAV</p>
+                <p class="eyebrow">Benchmark</p>
                 <h3 id="navTitle">净值对标曲线</h3>
               </div>
             </div>
             <div id="navChart" class="nav-chart"></div>
           </section>
 
-          <section class="panel" aria-labelledby="clientListTitle">
+          <section id="clientListPanel" class="panel" aria-labelledby="clientListTitle">
             <div class="panel-heading">
               <div>
-                <p class="eyebrow">Clients</p>
-                <h3 id="clientListTitle">客户份额</h3>
+                <p class="eyebrow">Accounts</p>
+                <h3 id="clientListTitle">客户视图</h3>
               </div>
             </div>
             <div id="clientList" class="client-list"></div>
           </section>
         </section>
 
-        <section id="holdingsSection" class="panel table-panel" aria-labelledby="holdingsTitle">
-          <div class="panel-heading table-heading">
+        <section id="holdingsSection" class="panel holdings-panel" aria-labelledby="holdingsTitle">
+          <div class="panel-heading holdings-heading">
             <div>
               <p class="eyebrow">Holdings</p>
               <h3 id="holdingsTitle">底层持仓拆分</h3>
+              <span class="section-subtitle">Top 20 holdings by market value</span>
             </div>
             <div class="table-tools">
               <div id="marketFilters" class="segmented"></div>
               <input id="holdingSearch" class="search-input" placeholder="搜索名称或代码" />
               <select id="sortSelect" class="sort-select">
                 <option value="value">按市值</option>
-                <option value="dayPnl">按当日损益</option>
-                <option value="floatingPnl">按浮动盈亏</option>
+                <option value="floatingPnl">按收益</option>
+                <option value="dayPnl">按涨跌</option>
                 <option value="weight">按权重</option>
               </select>
             </div>
           </div>
+
+          <div class="subsection-head">
+            <div>
+              <h4>Top 10 Holdings</h4>
+              <p>按当前账户市值排序，点击卡片可定位明细。</p>
+            </div>
+          </div>
+          <div id="topHoldingsStrip" class="top-holdings-strip"></div>
+
           <div class="table-wrap">
             <table>
               <thead>
@@ -214,29 +287,28 @@
                   <th>名称</th>
                   <th>市场</th>
                   <th>代码</th>
-                  <th>现价</th>
+                  <th>最新价</th>
                   <th>涨跌</th>
                   <th>用户市值</th>
-                  <th>用户权重</th>
+                  <th>资产占比</th>
                   <th>当日损益</th>
-                  <th>浮动盈亏</th>
                   <th>累计盈亏</th>
                 </tr>
               </thead>
               <tbody id="holdingsBody"></tbody>
             </table>
           </div>
+          <div class="table-actions">
+            <button id="holdingLimitButton" class="secondary-button" type="button">查看全部持仓</button>
+            <button id="exportHoldingsButton" class="secondary-button" type="button">导出持仓明细</button>
+          </div>
         </section>
 
         <section id="holdingDetailSection" class="panel holding-detail-panel" aria-labelledby="holdingDetailTitle">
           <div class="panel-heading">
             <div>
-              <p class="eyebrow">Holding Detail</p>
-              <h3 id="holdingDetailTitle">持仓详细</h3>
-            </div>
-            <div class="report-actions">
-              <a href="#reportsSection">下载报告</a>
-              <a href="#assetIncomeSection">历史收益查询</a>
+              <p class="eyebrow">Focus Holdings</p>
+              <h3 id="holdingDetailTitle">重点持仓详情 Top 10</h3>
             </div>
           </div>
           <div id="holdingDetailList" class="holding-detail-list"></div>
@@ -246,8 +318,8 @@
           <section id="dividendsSection" class="panel table-panel" aria-labelledby="dividendsTitle">
             <div class="panel-heading">
               <div>
-                <p class="eyebrow">Dividends</p>
-                <h3 id="dividendsTitle">分红与含分红收益</h3>
+                <p class="eyebrow">Dividends & Cash Income</p>
+                <h3 id="dividendsTitle">分红与现金收益</h3>
               </div>
               <span id="dividendTotal" class="pill">--</span>
             </div>
@@ -258,17 +330,19 @@
             <div class="panel-heading">
               <div>
                 <p class="eyebrow">Subscriptions</p>
-                <h3 id="lotsTitle">客户份额记录</h3>
+                <h3 id="lotsTitle">申购与份额记录</h3>
               </div>
+              <button class="secondary-button disabled-button" type="button" disabled>查看资金流水</button>
             </div>
+            <div id="lotsSummary" class="mini-summary-grid"></div>
             <div class="table-wrap compact">
               <table>
                 <thead>
                   <tr>
                     <th>日期</th>
-                    <th>金额</th>
+                    <th>申购金额</th>
                     <th>买入净值</th>
-                    <th>份额</th>
+                    <th>确认份额</th>
                     <th>当前市值</th>
                     <th>浮动盈亏</th>
                     <th>备注</th>
@@ -286,32 +360,21 @@
           >
             <div class="panel-heading">
               <div>
-                <p class="eyebrow">Anonymous Subscriptions</p>
-                <h3 id="anonymousSubscriptionsTitle">其他客户匿名加仓</h3>
+                <p class="eyebrow">Fund Activity</p>
+                <h3 id="anonymousSubscriptionsTitle">基金近期申购动态</h3>
+                <span class="section-subtitle">仅展示匿名化聚合数据，不包含客户身份信息。</span>
               </div>
             </div>
-            <div class="table-wrap compact">
-              <table>
-                <thead>
-                  <tr>
-                    <th>日期</th>
-                    <th>客户</th>
-                    <th>金额</th>
-                    <th>份额</th>
-                    <th>买入净值</th>
-                  </tr>
-                </thead>
-                <tbody id="anonymousSubscriptionsBody"></tbody>
-              </table>
-            </div>
+            <div id="anonymousSubscriptionsFeed" class="activity-feed"></div>
           </section>
 
           <section id="tradesSection" class="panel table-panel" aria-labelledby="tradesTitle">
             <div class="panel-heading">
               <div>
                 <p class="eyebrow">Fund Trades</p>
-                <h3 id="tradesTitle">近期基金交易</h3>
+                <h3 id="tradesTitle">基金交易动态</h3>
               </div>
+              <div id="tradeFilters" class="segmented compact-segmented"></div>
             </div>
             <div class="table-wrap compact">
               <table>
@@ -319,6 +382,7 @@
                   <tr>
                     <th>日期</th>
                     <th>名称</th>
+                    <th>代码</th>
                     <th>类型</th>
                     <th>价格</th>
                     <th>数量</th>
@@ -328,14 +392,19 @@
                 <tbody id="tradesBody"></tbody>
               </table>
             </div>
+            <div class="table-actions">
+              <button id="allTradesButton" class="secondary-button disabled-button" type="button" disabled>
+                查看全部交易
+              </button>
+            </div>
           </section>
         </section>
 
         <section id="reportsSection" class="panel reports-panel" aria-labelledby="reportsTitle">
           <div class="panel-heading">
             <div>
-              <p class="eyebrow">Reports</p>
-              <h3 id="reportsTitle">季度报与年报下载</h3>
+              <p class="eyebrow">Documents</p>
+              <h3 id="reportsTitle">报告与文件下载</h3>
             </div>
           </div>
           <div id="reportsGrid" class="reports-grid"></div>
@@ -348,6 +417,6 @@
       </section>
     </main>
 
-    <script src="./app.js?v=20260609-asset-reports"></script>
+    <script src="./app.js?v=20260609-ui-upgrade"></script>
   </body>
 </html>
