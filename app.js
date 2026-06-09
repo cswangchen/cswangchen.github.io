@@ -3,7 +3,7 @@ let DATA = null;
 const API_BASE =
   location.hostname === "127.0.0.1" || location.hostname === "localhost"
     ? ""
-    : "https://hsbg.scauwang.workers.dev";
+    : "https://api.invest-hsbg.uk";
 const AUTH_TOKEN_KEY = "hsbg.authToken";
 
 const state = {
