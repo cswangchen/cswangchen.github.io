@@ -20,19 +20,19 @@ const REPORTS = [
     title: "2025 年第一季度投资总结报告",
     period: "2025 Q1",
     type: "PDF",
-    href: "./assets/reports/hsbg-2025-q1-investment-report.pdf",
+    href: "./downloads/hsbg-2025-q1-investment-report.pdf",
   },
   {
     title: "2025 年第三季度路演报告",
     period: "2025 Q3",
     type: "PPTX",
-    href: "./assets/reports/hsbg-2025-q3.pptx",
+    href: "./downloads/hsbg-2025-q3.pptx",
   },
   {
     title: "2025 年度基金报告",
     period: "Annual 2025",
     type: "PDF",
-    href: "./assets/reports/hsbg-2025-annual-report-20260127.pdf",
+    href: "./downloads/hsbg-2025-annual-report-20260127.pdf",
   },
 ];
 
