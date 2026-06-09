@@ -38,16 +38,27 @@ async function api(path, options = {}) {
   const token = sessionStorage.getItem(AUTH_TOKEN_KEY);
   const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
   if (token) headers.Authorization = `Bearer ${token}`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), options.timeoutMs || 12000);
   const response = await fetch(`${API_BASE}${path}`, {
     credentials: API_BASE ? "omit" : "same-origin",
     headers,
+    signal: controller.signal,
     ...options,
+  }).catch((error) => {
+    if (error.name === "AbortError") throw new Error("连接服务超时，请稍后重试");
+    throw error;
   });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(payload.error || `HTTP ${response.status}`);
+  clearTimeout(timeout);
+  try {
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(payload.error || `HTTP ${response.status}`);
+    }
+    return payload;
+  } finally {
+    clearTimeout(timeout);
   }
-  return payload;
 }
 
 function formatCurrency(value, digits = 0) {
@@ -616,16 +627,16 @@ function bindEvents() {
 }
 
 async function init() {
+  bindEvents();
+  updateClock();
+  setInterval(updateClock, 1000);
+  syncAutoRefresh();
   try {
     PUBLIC_DATA = await api("/api/bootstrap");
     renderLoginSnapshot();
   } catch (error) {
     PUBLIC_DATA = { fund: { asOfDate: "", latestNav: { nav: 0 } }, marketSummary: [], navHistory: [] };
   }
-  bindEvents();
-  updateClock();
-  setInterval(updateClock, 1000);
-  syncAutoRefresh();
   try {
     if (sessionStorage.getItem(AUTH_TOKEN_KEY)) {
       await loadPortfolio();
