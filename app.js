@@ -164,7 +164,11 @@ async function login(username, password) {
     state.activeId = result.user.id;
     await loadPortfolio(result.user.id);
   } catch (error) {
-    $("#loginError").textContent = error.message;
+    const message = String(error.message || "");
+    $("#loginError").textContent =
+      message === "Failed to fetch" || message.includes("超时")
+        ? "无法连接云端服务，请稍后重试或使用备用访问域名"
+        : message;
   }
 }
 
