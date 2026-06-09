@@ -5,6 +5,10 @@ const API_BASE =
     ? ""
     : "https://api.invest-hsbg.uk";
 const AUTH_TOKEN_KEY = "hsbg.authToken";
+const REPORT_BASE =
+  location.hostname === "127.0.0.1" || location.hostname === "localhost"
+    ? "./downloads/"
+    : "https://raw.githubusercontent.com/cswangchen/cswangchen.github.io/master/downloads/";
 
 const state = {
   activeId: "",
@@ -20,19 +24,19 @@ const REPORTS = [
     title: "2025 年第一季度投资总结报告",
     period: "2025 Q1",
     type: "PDF",
-    href: "./downloads/hsbg-2025-q1-investment-report.pdf",
+    file: "hsbg-2025-q1-investment-report.pdf",
   },
   {
     title: "2025 年第三季度路演报告",
     period: "2025 Q3",
     type: "PPTX",
-    href: "./downloads/hsbg-2025-q3.pptx",
+    file: "hsbg-2025-q3.pptx",
   },
   {
     title: "2025 年度基金报告",
     period: "Annual 2025",
     type: "PDF",
-    href: "./downloads/hsbg-2025-annual-report-20260127.pdf",
+    file: "hsbg-2025-annual-report-20260127.pdf",
   },
 ];
 
@@ -874,7 +878,7 @@ function renderHoldingDetails(context) {
 function renderReports() {
   $("#reportsGrid").innerHTML = REPORTS.map(
     (report) => `
-      <a class="report-card" href="${escapeHtml(report.href)}" download>
+      <a class="report-card" href="${escapeHtml(`${REPORT_BASE}${report.file}`)}" target="_blank" rel="noopener noreferrer" download>
         <span>${escapeHtml(report.period)}</span>
         <strong>${escapeHtml(report.title)}</strong>
         <small>${escapeHtml(report.type)} · 下载</small>
