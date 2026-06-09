@@ -1,33 +1,247 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content=""><meta name="keywords" content=""><meta name="author" content="Barry,undefined"><meta name="copyright" content="Barry"><title>Barry~Wang</title><link rel="shortcut icon" href="/my-favicon.ico"><link rel="stylesheet" href="/css/index.css?version=1.5.6"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css?version=1.5.6"><link rel="dns-prefetch" href="https://cdn.staticfile.org"><link rel="dns-prefetch" href="https://cdn.bootcss.com"><link rel="dns-prefetch" href="https://creativecommons.org"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/instantsearch.js@2.1.1/dist/instantsearch.min.css"><script src="https://cdn.jsdelivr.net/npm/instantsearch.js@2.1.1/dist/instantsearch.min.js" defer></script><link rel="manifest" href="/manifest.json"><link rel="manifest" href="/manifest.json"><script>var GLOBAL_CONFIG = { 
-  root: '/',
-  algolia: {"appId":"8QT4L0CXE9","apiKey":"1877af51500419bbab714be98a68b5b4","indexName":"19e8752356b6551b2eb60104ffc8b49f","hits":{"per_page":10},"languages":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}.","hits_stats":"${hits} results found in ${time} ms"}},
-  localSearch: undefined,
-  copy: {
-    success: 'Copy successfully',
-    error: 'Copy error',
-    noSupport: 'The browser does not support'
-  }
-} </script></head><body><canvas class="fireworks"></canvas><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar"><div class="author-info"><div class="author-info__avatar text-center"><img src="https://avatars1.githubusercontent.com/u/10419686?s=460&amp;v=4"></div><div class="author-info__name text-center">Barry</div><div class="author-info__description text-center"></div><div class="follow-button"><a href="https://github.com/cswangchen" target="_blank">Follow Me</a></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">Articles</span><span class="pull-right">4</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">Tags</span><span class="pull-right">4</span></a><a class="author-info-articles__categories article-meta" href="/categories"><span class="pull-left">Categories</span><span class="pull-right">1</span></a></div><hr><div class="author-info-links"><div class="author-info-links__title text-center">Links</div><a class="author-info-links__name text-center" href="https://cswangchen.github.io/" target="_blank">Home</a><a class="author-info-links__name text-center" href="https://www.zhihu.com/people/cswangchen/activities" target="_blank">Zhihu</a></div></div></div><nav class="no-bg" id="nav" style="background-image: url(true)"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">Barry~Wang</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus"><a class="site-page social-icon search"><i class="fa fa-search"></i><span> Search</span></a><a class="site-page" href="/">Home</a><a class="site-page" href="/archives">Archives</a><a class="site-page" href="/tags">Tags</a><a class="site-page" href="/categories">Categories</a><a class="site-page" href="/about">About</a></span></div><div id="site-info"><div id="site-title">Barry~Wang</div><div id="site-sub-title"></div><div id="site-social-icons"> <a class="social-icon" href="https://github.com/cswangchen/" target="_blank"><i class="fa fa-github"></i></a><a class="social-icon" href="https://weibo.com/iloveyouwangchen" target="_blank"><i class="fa fa-weibo"></i></a><a class="social-icon" href="https://Molunerfinn/atom.xml" target="_blank"><i class="fa fa-rss"></i></a><a class="social-icon" href="scauwang@stu.scau.edu.cn" target="_blank"><i class="fa fa-at"></i></a><a class="social-icon search"><i class="fa fa-search"></i></a></div></div></nav><div id="content-outer"><div class="layout" id="content-inner"><div class="recent-post-item article-container"><a class="article-title" href="/2019/09/12/912/">Deep Traffic</a><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2019-09-12</time><span class="article-meta"><span class="article-meta__separator">|</span><i class="fa fa-inbox article-meta__icon" aria-hidden="true"></i><a class="article-meta__categories" href="/categories/coding/">coding</a></span><span class="article-meta tags"><span class="article-meta__separator">|</span><i class="fa fa-tag article-meta__icon" aria-hidden="true"></i><a class="article-meta__tags" href="/tags/MIT/">MIT</a><span class="article-meta__link">-</span><i class="fa fa-tag article-meta__icon" aria-hidden="true"></i><a class="article-meta__tags" href="/tags/Deep-Learning/">Deep Learning</a></span><div class="content">说明
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <title>HSBG 巴豐基金客户动态视图</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main id="loginView" class="login-view">
+      <section class="login-panel" aria-labelledby="loginTitle">
+        <div class="brand-lockup">
+          <img src="./assets/logo.png" alt="HSBG" />
+          <div>
+            <span>HSBG Fund</span>
+            <h1 id="loginTitle">巴豐基金客户动态视图</h1>
+          </div>
+        </div>
 
-本文来源：MIT S6.1
+        <form id="loginForm" class="login-form">
+          <label for="clientIdInput">用户名</label>
+          <div class="login-row single">
+            <input
+              id="clientIdInput"
+              name="username"
+              autocomplete="username"
+              spellcheck="false"
+              placeholder="请输入用户名"
+            />
+          </div>
 
-</div><a class="more" href="/2019/09/12/912/#more" style="margin-top: 14px">Read more</a><hr></div><div class="recent-post-item article-container"><a class="article-title" href="/2018/10/19/topimag/">No title</a><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2018-10-19</time><div class="content">title: Hi, theme-melody!tags:
+          <label for="passwordInput">密码</label>
+          <div class="login-row">
+            <input
+              id="passwordInput"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              placeholder="请输入密码"
+            />
+            <button type="submit">登录</button>
+          </div>
+          <p id="loginError" class="login-error" role="alert"></p>
+        </form>
+      </section>
 
-hexo
-hexo themetop_img: http://tu.1015600.com/2014/pic/000/360/718352f0b19857fa5d6a95f4cd81d114.jpgdate: 2017-09-07
+      <section class="login-market" aria-label="基金快照">
+        <div class="snapshot-top">
+          <span id="loginAsOf">数据日</span>
+          <strong id="loginNav">--</strong>
+        </div>
+        <div id="loginMarketBars" class="market-bars"></div>
+      </section>
+    </main>
 
-</div><a class="more" href="/2018/10/19/topimag/#more" style="margin-top: 14px">Read more</a><hr></div><div class="recent-post-item article-container"><a class="article-title" href="/2018/10/19/slides/">hexo-theme-melody v1.5 supports slides &amp; iframe</a><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2018-10-19</time><a class="article-type" href="/slides">Slides</a><span class="article-meta tags"><span class="article-meta__separator">|</span><i class="fa fa-tag article-meta__icon" aria-hidden="true"></i><a class="article-meta__tags" href="/tags/hexo/">hexo</a></span><div class="content"><iframe src="/2018/10/19/slides/" frameborder="0"></iframe></div><hr></div><div class="recent-post-item article-container"><a class="article-title" href="/2018/10/19/hello-world/">Hello World</a><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2018-10-19</time><span class="article-meta tags"><span class="article-meta__separator">|</span><i class="fa fa-tag article-meta__icon" aria-hidden="true"></i><a class="article-meta__tags" href="/tags/hexo/">hexo</a><span class="article-meta__link">-</span><i class="fa fa-tag article-meta__icon" aria-hidden="true"></i><a class="article-meta__tags" href="/tags/hexo-theme/">hexo theme</a></span><div class="content">Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in  ...</div><a class="more" href="/2018/10/19/hello-world/#more" style="margin-top: 14px">Read more</a><hr></div><nav id="pagination"><div class="pagination"><span class="page-number current">1</span></div></nav></div></div><footer><div class="layout" id="footer"><div class="copyright">&copy;2018 - 2019 By Barry</div><div class="framework-info"><span>Driven - </span><a href="http://hexo.io"><span>Hexo</span></a><span class="footer-separator">|</span><span>Theme - </span><a href="https://github.com/Molunerfinn/hexo-theme-melody"><span>Melody</span></a></div><div class="footer_custom_text">Never to be <a href="https://cswangchen.github.io/">naive！</a></div><div class="busuanzi"><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_site_uv"><i class="fa fa-user"></i><span id="busuanzi_value_site_uv"></span><span></span></span><span class="footer-separator">|</span><span id="busuanzi_container_site_pv"><i class="fa fa-eye"></i><span id="busuanzi_value_site_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="/js/third-party/anime.min.js"></script><script src="/js/third-party/jquery.min.js"></script><script src="/js/third-party/jquery.fancybox.min.js"></script><script src="/js/third-party/velocity.min.js"></script><script src="/js/third-party/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.5.6"></script><script src="/js/fancybox.js?version=1.5.6"></script><script src="/js/sidebar.js?version=1.5.6"></script><script src="/js/copy.js?version=1.5.6"></script><script src="/js/fireworks.js?version=1.5.6"></script><script src="/js/transition.js?version=1.5.6"></script><script src="/js/scroll.js?version=1.5.6"></script><script src="/js/head.js?version=1.5.6"></script><script src="/js/search/algolia.js"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({
-  tex2jax: {
-    inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
-    processEscapes: true,
-    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-  }
-});
-</script><script type="text/x-mathjax-config">MathJax.Hub.Queue(function() {
-  var all = MathJax.Hub.getAllJax(), i;
-  for (i=0; i < all.length; i += 1) {
-    all[i].SourceElement().parentNode.className += ' has-jax';
-  }
-});
-</script><script src="https://cdn.bootcss.com/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><div class="search-dialog" id="algolia-search"><div class="search-dialog__title" id="algolia-search-title">Algolia</div><div id="algolia-input-panel"><div id="algolia-search-input"></div></div><hr><div id="algolia-search-results"><div id="algolia-hits"></div><div id="algolia-pagination"></div><div id="algolia-stats"></div></div><span class="search-close-button"><i class="fa fa-times"></i></span></div><div class="search-mask"></div><script>'use strict';'serviceWorker'in navigator&&navigator.serviceWorker.register('service-worker.js').then(function(a){a.onupdatefound=function(){var b=a.installing;b.onstatechange=function(){switch(b.state){case'installed':navigator.serviceWorker.controller?console.log('New or updated content is available.'):console.log('Content is now available offline!');break;case'redundant':console.error('The installing service worker became redundant.');}}}}).catch(function(a){console.error('Error during service worker registration:',a)});
-</script></body></html>
+    <main id="appView" class="app-view hidden">
+      <aside class="side-nav">
+        <div class="side-brand">
+          <img src="./assets/logo.png" alt="HSBG" />
+          <div>
+            <span>HSBG Fund</span>
+            <strong>客户视图</strong>
+          </div>
+        </div>
+
+        <div id="vipCard" class="vip-card hidden">
+          <span>Premier</span>
+          <strong>VIP Account</strong>
+        </div>
+
+        <label class="side-label" for="clientSelect">当前账户</label>
+        <select id="clientSelect" class="client-select"></select>
+
+        <nav class="section-nav" aria-label="页面区域">
+          <a href="#summarySection">总览</a>
+          <a href="#holdingsSection">持仓</a>
+          <a href="#dividendsSection">分红</a>
+          <a href="#lotsSection">份额</a>
+          <a href="#tradesSection">交易</a>
+        </nav>
+
+        <button id="logoutButton" class="ghost-button" type="button">退出</button>
+      </aside>
+
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow" id="asOfLabel">数据日</p>
+            <h2 id="clientTitle">--</h2>
+            <span id="tierBadge" class="tier-badge hidden">VIP</span>
+          </div>
+          <div class="top-actions">
+            <label class="toggle">
+              <input id="autoRefreshToggle" type="checkbox" />
+              <span>自动刷新</span>
+            </label>
+            <button id="reloadButton" class="utility-button" type="button">刷新</button>
+            <span id="clockLabel" class="clock-label">--</span>
+          </div>
+        </header>
+
+        <section id="summarySection" class="kpi-grid" aria-label="客户总览"></section>
+
+        <section class="dashboard-grid">
+          <section class="panel panel-wide" aria-labelledby="allocationTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Market Allocation</p>
+                <h3 id="allocationTitle">市场配置与当日损益</h3>
+              </div>
+              <span id="fundDayPnl" class="pill">--</span>
+            </div>
+            <div id="marketSummary" class="market-summary"></div>
+          </section>
+
+          <section class="panel" aria-labelledby="navTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">NAV</p>
+                <h3 id="navTitle">单位净值走势</h3>
+              </div>
+            </div>
+            <div id="navChart" class="nav-chart"></div>
+          </section>
+
+          <section class="panel" aria-labelledby="clientListTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Clients</p>
+                <h3 id="clientListTitle">客户份额</h3>
+              </div>
+            </div>
+            <div id="clientList" class="client-list"></div>
+          </section>
+        </section>
+
+        <section id="holdingsSection" class="panel table-panel" aria-labelledby="holdingsTitle">
+          <div class="panel-heading table-heading">
+            <div>
+              <p class="eyebrow">Holdings</p>
+              <h3 id="holdingsTitle">底层持仓拆分</h3>
+            </div>
+            <div class="table-tools">
+              <div id="marketFilters" class="segmented"></div>
+              <input id="holdingSearch" class="search-input" placeholder="搜索名称或代码" />
+              <select id="sortSelect" class="sort-select">
+                <option value="value">按市值</option>
+                <option value="dayPnl">按当日损益</option>
+                <option value="floatingPnl">按浮动盈亏</option>
+                <option value="weight">按权重</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>名称</th>
+                  <th>市场</th>
+                  <th>代码</th>
+                  <th>现价</th>
+                  <th>涨跌</th>
+                  <th>用户市值</th>
+                  <th>用户权重</th>
+                  <th>当日损益</th>
+                  <th>浮动盈亏</th>
+                  <th>累计盈亏</th>
+                </tr>
+              </thead>
+              <tbody id="holdingsBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="dashboard-grid lower-grid">
+          <section id="dividendsSection" class="panel table-panel" aria-labelledby="dividendsTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Dividends</p>
+                <h3 id="dividendsTitle">分红与含分红收益</h3>
+              </div>
+              <span id="dividendTotal" class="pill">--</span>
+            </div>
+            <div id="dividendSummary" class="dividend-summary"></div>
+          </section>
+
+          <section id="lotsSection" class="panel table-panel" aria-labelledby="lotsTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Subscriptions</p>
+                <h3 id="lotsTitle">客户份额记录</h3>
+              </div>
+            </div>
+            <div class="table-wrap compact">
+              <table>
+                <thead>
+                  <tr>
+                    <th>日期</th>
+                    <th>金额</th>
+                    <th>买入净值</th>
+                    <th>份额</th>
+                    <th>当前市值</th>
+                    <th>浮动盈亏</th>
+                    <th>备注</th>
+                  </tr>
+                </thead>
+                <tbody id="lotsBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="tradesSection" class="panel table-panel" aria-labelledby="tradesTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Fund Trades</p>
+                <h3 id="tradesTitle">近期基金交易</h3>
+              </div>
+            </div>
+            <div class="table-wrap compact">
+              <table>
+                <thead>
+                  <tr>
+                    <th>日期</th>
+                    <th>名称</th>
+                    <th>类型</th>
+                    <th>价格</th>
+                    <th>数量</th>
+                    <th>金额</th>
+                  </tr>
+                </thead>
+                <tbody id="tradesBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section class="notes-band" aria-label="数据口径">
+          <strong>数据口径</strong>
+          <span id="assumptionText"></span>
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
