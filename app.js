@@ -619,18 +619,22 @@ async function init() {
   try {
     PUBLIC_DATA = await api("/api/bootstrap");
     renderLoginSnapshot();
-    bindEvents();
-    updateClock();
-    setInterval(updateClock, 1000);
-    syncAutoRefresh();
-    try {
+  } catch (error) {
+    PUBLIC_DATA = { fund: { asOfDate: "", latestNav: { nav: 0 } }, marketSummary: [], navHistory: [] };
+  }
+  bindEvents();
+  updateClock();
+  setInterval(updateClock, 1000);
+  syncAutoRefresh();
+  try {
+    if (sessionStorage.getItem(AUTH_TOKEN_KEY)) {
       await loadPortfolio();
-    } catch {
-      sessionStorage.removeItem(AUTH_TOKEN_KEY);
+    } else {
       setView(false);
     }
-  } catch (error) {
-    document.body.innerHTML = `<main class="login-panel"><h1>加载失败</h1><p>${escapeHtml(error.message)}</p></main>`;
+  } catch {
+    sessionStorage.removeItem(AUTH_TOKEN_KEY);
+    setView(false);
   }
 }
 
