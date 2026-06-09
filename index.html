@@ -45,11 +45,15 @@
         </form>
       </section>
 
-      <section class="login-market" aria-label="基金快照">
+      <section class="login-market" aria-label="收益率前六持仓">
         <div class="snapshot-top">
-          <span id="loginAsOf">数据日</span>
-          <strong id="loginNav">--</strong>
+          <div>
+            <span id="loginAsOf">数据日</span>
+            <strong id="loginNav">--</strong>
+          </div>
+          <small>持仓收益率 Top 6</small>
         </div>
+        <div id="loginTopPerformers" class="login-performer-grid"></div>
         <div id="loginMarketBars" class="market-bars"></div>
       </section>
     </main>
@@ -74,10 +78,13 @@
 
         <nav class="section-nav" aria-label="页面区域">
           <a href="#summarySection">总览</a>
+          <a href="#assetOverviewSection">资产</a>
+          <a href="#assetIncomeSection">收益</a>
           <a href="#holdingsSection">持仓</a>
           <a href="#dividendsSection">分红</a>
           <a href="#lotsSection">份额</a>
           <a href="#anonymousSubscriptionsSection">匿名加仓</a>
+          <a href="#reportsSection">报告</a>
           <a href="#tradesSection">交易</a>
         </nav>
 
@@ -101,7 +108,54 @@
           </div>
         </header>
 
+        <section id="wealthHero" class="wealth-hero" aria-label="账户欢迎区">
+          <div>
+            <h2 id="welcomeLine">下午好</h2>
+            <p id="heroMeta">最新数据</p>
+          </div>
+          <div class="hero-actions">
+            <a class="hero-button" href="#assetIncomeSection">历史收益查询</a>
+            <a class="hero-button secondary" href="#reportsSection">账户报告</a>
+          </div>
+        </section>
+
+        <section id="assetOverviewSection" class="asset-console" aria-labelledby="assetOverviewTitle">
+          <div class="asset-table-card">
+            <div class="asset-head">
+              <h3 id="assetOverviewTitle">资产</h3>
+              <span>总收益</span>
+              <span>日收益</span>
+            </div>
+            <div id="assetRows" class="asset-rows"></div>
+          </div>
+          <aside class="tenk-card" aria-labelledby="tenkTitle">
+            <div class="tenk-select">HSBG 巴豐基金</div>
+            <h3 id="tenkTitle">每万份收益</h3>
+            <strong id="tenkTotal">--</strong>
+            <div id="tenkChart" class="mini-chart"></div>
+          </aside>
+        </section>
+
         <section id="summarySection" class="kpi-grid" aria-label="客户总览"></section>
+
+        <section id="assetIncomeSection" class="panel asset-income-panel" aria-labelledby="assetIncomeTitle">
+          <div class="panel-heading asset-income-heading">
+            <div>
+              <p class="eyebrow">Asset Income</p>
+              <h3 id="assetIncomeTitle">资产收益图</h3>
+            </div>
+            <div id="assetRangeTabs" class="asset-tabs" aria-label="收益图周期">
+              <button type="button" class="active" data-range="1m">近一月</button>
+              <button type="button" data-range="3m">近三月</button>
+              <button type="button" data-range="1y">近一年</button>
+              <button type="button" data-range="ytd">今年以来</button>
+            </div>
+          </div>
+          <div class="asset-income-grid">
+            <div id="assetIncomeChart" class="asset-income-chart"></div>
+            <div id="marketPie" class="market-pie"></div>
+          </div>
+        </section>
 
         <section class="dashboard-grid">
           <section class="panel panel-wide" aria-labelledby="allocationTitle">
@@ -172,6 +226,20 @@
               <tbody id="holdingsBody"></tbody>
             </table>
           </div>
+        </section>
+
+        <section id="holdingDetailSection" class="panel holding-detail-panel" aria-labelledby="holdingDetailTitle">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Holding Detail</p>
+              <h3 id="holdingDetailTitle">持仓详细</h3>
+            </div>
+            <div class="report-actions">
+              <a href="#reportsSection">下载报告</a>
+              <a href="#assetIncomeSection">历史收益查询</a>
+            </div>
+          </div>
+          <div id="holdingDetailList" class="holding-detail-list"></div>
         </section>
 
         <section class="dashboard-grid lower-grid">
@@ -261,6 +329,16 @@
               </table>
             </div>
           </section>
+        </section>
+
+        <section id="reportsSection" class="panel reports-panel" aria-labelledby="reportsTitle">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Reports</p>
+              <h3 id="reportsTitle">季度报与年报下载</h3>
+            </div>
+          </div>
+          <div id="reportsGrid" class="reports-grid"></div>
         </section>
 
         <section class="notes-band" aria-label="数据口径">

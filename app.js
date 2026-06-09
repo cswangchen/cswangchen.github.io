@@ -11,7 +11,36 @@ const state = {
   market: "全部",
   search: "",
   sort: "value",
+  assetRange: "1m",
   autoRefresh: localStorage.getItem("hsbg.autoRefresh") === "1",
+};
+
+const REPORTS = [
+  {
+    title: "2025 年第一季度投资总结报告",
+    period: "2025 Q1",
+    type: "PDF",
+    href: "./assets/reports/hsbg-2025-q1-investment-report.pdf",
+  },
+  {
+    title: "2025 年第三季度路演报告",
+    period: "2025 Q3",
+    type: "PPTX",
+    href: "./assets/reports/hsbg-2025-q3.pptx",
+  },
+  {
+    title: "2025 年度基金报告",
+    period: "Annual 2025",
+    type: "PDF",
+    href: "./assets/reports/hsbg-2025-annual-report-20260127.pdf",
+  },
+];
+
+const DIVIDEND_DATES = {
+  christmas2024: "2024-12-25",
+  mid2025: "2025-06-11",
+  specialJan2026: "2026-01-19",
+  annual2025: "2026-01-28",
 };
 
 const MARKET_COLORS = {
@@ -117,6 +146,22 @@ function renderLoginSnapshot() {
   if (!PUBLIC_DATA) return;
   $("#loginAsOf").textContent = `数据日 ${PUBLIC_DATA.fund.asOfDate}`;
   $("#loginNav").textContent = `NAV ${formatNumber(PUBLIC_DATA.fund.latestNav.nav, 4)}`;
+  $("#loginTopPerformers").innerHTML = (PUBLIC_DATA.topPerformers || [])
+    .map((item) => {
+      const positive = Number(item.returnRate || 0) >= 0;
+      return `
+        <article class="performer-card">
+          <div>
+            <strong>${escapeHtml(item.name)}</strong>
+            <span>${escapeHtml(item.code)} · ${escapeHtml(item.market)}</span>
+          </div>
+          <b class="${positive ? "hot-positive" : "hot-negative"}">${formatPercent(item.returnRate, 2)}</b>
+          <small>累计收益率 · 最新价 ${formatNumber(item.price, 2)} ${escapeHtml(item.currency)}</small>
+          <a href="${escapeHtml(item.detailUrl)}" target="_blank" rel="noopener noreferrer">查看详情</a>
+        </article>
+      `;
+    })
+    .join("");
   $("#loginMarketBars").innerHTML = marketItems(PUBLIC_DATA)
     .map((item) => {
       const width = Math.max(2, item.weight * 100);
@@ -278,6 +323,214 @@ function renderMarketSummary(context) {
     .join("");
 }
 
+function dateToTime(date) {
+  return new Date(`${date}T00:00:00`).getTime();
+}
+
+function dividendsThrough(context, date) {
+  const detail = context.dividends?.detail || {};
+  return Object.entries(DIVIDEND_DATES).reduce((sum, [key, eventDate]) => {
+    return date >= eventDate ? sum + Number(detail[key] || 0) : sum;
+  }, 0);
+}
+
+function clientAssetSeries(context) {
+  const lots = context.lots || [];
+  return (DATA?.navHistory || [])
+    .filter((row) => row.date && Number(row.nav) > 0)
+    .map((row) => {
+      const activeLots = lots.filter((lot) => lot.date <= row.date);
+      const shares = activeLots.reduce((sum, lot) => sum + Number(lot.shares || 0), 0);
+      if (!shares) return null;
+      const invested = activeLots.reduce((sum, lot) => sum + Number(lot.investment || 0), 0);
+      const asset = shares * Number(row.nav || 0);
+      return {
+        date: row.date,
+        nav: Number(row.nav || 0),
+        asset,
+        income: asset - invested + dividendsThrough(context, row.date),
+      };
+    })
+    .filter(Boolean);
+}
+
+function perTenThousandSeries() {
+  const rows = (DATA?.navHistory || PUBLIC_DATA?.navHistory || []).filter((row) => row.date && Number(row.nav) > 0);
+  return rows.map((row, index) => {
+    const previous = rows[index - 1];
+    const perTenK = previous ? (Number(row.nav || 0) - Number(previous.nav || 0)) * 10000 : 0;
+    return { date: row.date, nav: Number(row.nav || 0), perTenK };
+  });
+}
+
+function filterSeriesByRange(series, range) {
+  if (series.length <= 2) return series;
+  const latest = series.at(-1);
+  const latestTime = dateToTime(latest.date);
+  const cutoff = new Date(latestTime);
+  if (range === "1m") cutoff.setMonth(cutoff.getMonth() - 1);
+  if (range === "3m") cutoff.setMonth(cutoff.getMonth() - 3);
+  if (range === "1y") cutoff.setFullYear(cutoff.getFullYear() - 1);
+  if (range === "ytd") cutoff.setMonth(0, 1);
+  const filtered = series.filter((item) => dateToTime(item.date) >= cutoff.getTime());
+  return filtered.length >= 2 ? filtered : series.slice(-2);
+}
+
+function linePath(points, key, x, y) {
+  return points.map((item, index) => `${index === 0 ? "M" : "L"} ${x(index)} ${y(Number(item[key] || 0))}`).join(" ");
+}
+
+function dualLineChart(points, primary, secondary, options = {}) {
+  if (!points.length) return "";
+  const width = options.width || 760;
+  const height = options.height || 260;
+  const padX = 44;
+  const padTop = 24;
+  const padBottom = 42;
+  const values = points.flatMap((item) => [Number(item[primary.key] || 0), Number(item[secondary.key] || 0)]);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const x = (index) => padX + (index / Math.max(points.length - 1, 1)) * (width - padX * 2);
+  const y = (value) => padTop + (1 - (value - min) / span) * (height - padTop - padBottom);
+  const grid = [0, 0.5, 1]
+    .map((ratio) => {
+      const gridY = padTop + ratio * (height - padTop - padBottom);
+      const value = max - ratio * span;
+      return `<line x1="${padX}" y1="${gridY}" x2="${width - padX}" y2="${gridY}" stroke="#d7e3ef"/><text x="${padX - 8}" y="${gridY + 4}" text-anchor="end" fill="#6b7280" font-size="11">${formatNumber(value, options.digits ?? 0)}</text>`;
+    })
+    .join("");
+  const dots = points
+    .filter((_, index) => points.length <= 28 || index === points.length - 1 || index % Math.ceil(points.length / 10) === 0)
+    .map(
+      (item, index, visible) =>
+        `<circle class="chart-dot" cx="${x(points.indexOf(item))}" cy="${y(Number(item[primary.key] || 0))}" r="${
+          visible.length - 1 === index ? 5 : 3
+        }"><title>${item.date} ${primary.label}: ${formatNumber(item[primary.key], options.digits ?? 0)} / ${
+          secondary.label
+        }: ${formatNumber(item[secondary.key], options.digits ?? 0)}</title></circle>`,
+    )
+    .join("");
+  return `
+    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(options.label || "收益曲线")}">
+      ${grid}
+      <path class="income-line primary-line" d="${linePath(points, primary.key, x, y)}"></path>
+      <path class="income-line secondary-line" d="${linePath(points, secondary.key, x, y)}"></path>
+      ${dots}
+      <text x="${padX}" y="${height - 10}" fill="#6b7280" font-size="12">${escapeHtml(points[0].date)}</text>
+      <text x="${width - padX}" y="${height - 10}" text-anchor="end" fill="#6b7280" font-size="12">${escapeHtml(
+        points.at(-1).date,
+      )}</text>
+    </svg>
+    <div class="chart-legend">
+      <span class="chart-legend-item primary-line">${escapeHtml(primary.label)}</span>
+      <span class="chart-legend-item secondary-line">${escapeHtml(secondary.label)}</span>
+    </div>
+  `;
+}
+
+function singleLineChart(points, key, options = {}) {
+  if (!points.length) return "";
+  const normalized = points.map((item) => ({ ...item, zero: 0 }));
+  return dualLineChart(
+    normalized,
+    { key, label: options.label || "每万份收益" },
+    { key: "zero", label: "0" },
+    { width: 460, height: 220, digits: 2, label: options.label || "每万份收益" },
+  );
+}
+
+function renderWealthHero(context) {
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "上午好" : hour < 18 ? "下午好" : "晚上好";
+  $("#welcomeLine").textContent = `${greeting}，${context.name}`;
+  $("#heroMeta").textContent = `当前账户 ${context.id} · 数据日 ${DATA.fund.asOfDate} · ${context.tier?.label || "Member"}`;
+}
+
+function renderAssetOverview(context) {
+  const dividends = context.dividends || { cumulativeWithDividends: context.floatingPnl };
+  const rows = [
+    {
+      label: "人民币总资产（元）",
+      marker: "=",
+      value: context.currentValue,
+      income: dividends.cumulativeWithDividends,
+      day: context.dayPnl,
+      total: true,
+    },
+    { label: "现金账户资产", marker: "■", value: context.cashValue, income: 0, day: 0 },
+    { label: "基金资产", marker: "■", value: context.positionValue, income: dividends.cumulativeWithDividends, day: context.dayPnl },
+    { label: "个人养老金资产", marker: "+", value: 0, income: 0, day: 0 },
+    { label: "投顾资产", marker: "+", value: 0, income: 0, day: 0 },
+  ];
+  $("#assetRows").innerHTML = rows
+    .map(
+      (row) => `
+        <div class="asset-row ${row.total ? "total" : ""}">
+          <span class="asset-marker">${escapeHtml(row.marker)}</span>
+          <strong>${escapeHtml(row.label)}</strong>
+          <b>${formatNumber(row.value, 2)}</b>
+          <b class="${tone(row.income)}">${formatNumber(row.income, 2)}</b>
+          <b class="${tone(row.day)}">${formatNumber(row.day, 2)}</b>
+        </div>
+      `,
+    )
+    .join("");
+
+  const tenK = perTenThousandSeries();
+  const currentYear = String(DATA.fund.asOfDate || "").slice(0, 4);
+  const yearSum = tenK
+    .filter((item) => item.date.startsWith(currentYear))
+    .reduce((sum, item) => sum + Number(item.perTenK || 0), 0);
+  $("#tenkTotal").textContent = `今年以来累计 ${formatNumber(yearSum, 2)}`;
+  $("#tenkTotal").className = tone(yearSum);
+  $("#tenkChart").innerHTML = singleLineChart(tenK.slice(-30), "perTenK", { label: "每万份收益" });
+}
+
+function renderAssetIncome(context) {
+  const points = filterSeriesByRange(clientAssetSeries(context), state.assetRange);
+  $("#assetIncomeChart").innerHTML = dualLineChart(
+    points.map((item) => ({ ...item, assetWan: item.asset / 10000 })),
+    { key: "assetWan", label: "总资产(万元)" },
+    { key: "income", label: "总收益(元)" },
+    { label: "资产收益图", digits: 2 },
+  );
+  renderMarketPie(context);
+}
+
+function renderMarketPie(context) {
+  const rows = [
+    ...marketItems(DATA).map((item) => ({
+      label: item.market,
+      value: item.marketValueCny * context.portfolioRatio,
+      color: MARKET_COLORS[item.market] || "#1f2522",
+    })),
+    { label: "现金", value: context.cashValue, color: MARKET_COLORS["现金"] },
+  ].filter((item) => Number(item.value) > 0);
+  const total = rows.reduce((sum, item) => sum + item.value, 0) || 1;
+  let start = 0;
+  const gradient = rows
+    .map((item) => {
+      const end = start + (item.value / total) * 100;
+      const segment = `${item.color} ${start}% ${end}%`;
+      start = end;
+      return segment;
+    })
+    .join(", ");
+  $("#marketPie").innerHTML = `
+    <div class="pie-disc" style="background: conic-gradient(${gradient})"></div>
+    <div class="pie-legend">
+      ${rows
+        .map(
+          (item) => `
+            <span><i style="background:${item.color}"></i>${escapeHtml(item.label)} ${formatPercent(item.value / total, 2)}</span>
+          `,
+        )
+        .join("")}
+    </div>
+  `;
+}
+
 function renderNavChart() {
   const points = (DATA?.performanceBenchmark || PUBLIC_DATA?.performanceBenchmark || []).filter(
     (item) => item.fundTotalReturnIndex > 0 && item.weightedBenchmarkIndex > 0,
@@ -410,6 +663,7 @@ function renderMarketFilters() {
     button.addEventListener("click", () => {
       state.market = button.dataset.market;
       renderHoldings(currentContext());
+      renderHoldingDetails(currentContext());
       renderMarketFilters();
     });
   });
@@ -563,6 +817,72 @@ function renderAnonymousSubscriptions() {
     .join("");
 }
 
+function holdingSparkline(item) {
+  if (item.isCash) return "";
+  const current = Number(item.price || 0);
+  const change = Number(item.change?.amount || 0);
+  const previous = current - change;
+  const drift = current - previous;
+  const values = [previous, previous + drift * 0.16, previous + drift * 0.34, previous + drift * 0.52, previous + drift * 0.76, current];
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const width = 280;
+  const height = 88;
+  const x = (index) => 12 + (index / Math.max(values.length - 1, 1)) * (width - 24);
+  const y = (value) => 12 + (1 - (value - min) / span) * (height - 24);
+  const path = values.map((value, index) => `${index === 0 ? "M" : "L"} ${x(index)} ${y(value)}`).join(" ");
+  return `
+    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(item.name)} 当日走势">
+      <line x1="12" y1="44" x2="${width - 12}" y2="44" stroke="#e5edf5"></line>
+      <path d="${path}" class="spark-path ${change >= 0 ? "spark-up" : "spark-down"}"></path>
+    </svg>
+  `;
+}
+
+function renderHoldingDetails(context) {
+  const rows = holdingRows(context)
+    .filter((item) => !item.isCash)
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 8);
+  $("#holdingDetailList").innerHTML = rows
+    .map(
+      (item) => `
+        <article class="holding-detail-card">
+          <div class="holding-title-row">
+            <div>
+              ${stockNameCell(item)}
+              <span class="code-pill">${escapeHtml(item.code)}</span>
+            </div>
+            <a class="detail-button" href="${escapeHtml(item.detailUrl)}" target="_blank" rel="noopener noreferrer">详情</a>
+          </div>
+          <div class="holding-detail-grid">
+            <span>最新市值 <b>${formatCurrency(item.value)}</b></span>
+            <span>持有数量 <b>${formatNumber(item.userQuantity, 2)}</b></span>
+            <span>最新价 <b>${formatNumber(item.price, 2)} ${escapeHtml(item.currency)}</b></span>
+            <span>当日涨跌 <b class="${tone(item.change.amount)}">${escapeHtml(item.change.raw)}</b></span>
+            <span>持仓收益 <b class="${tone(item.userCumulativePnl)}">${formatCurrency(item.userCumulativePnl)}</b></span>
+            <span>资产占比 <b>${formatPercent(item.userWeight, 2)}</b></span>
+          </div>
+          <div class="holding-spark">${holdingSparkline(item)}</div>
+        </article>
+      `,
+    )
+    .join("");
+}
+
+function renderReports() {
+  $("#reportsGrid").innerHTML = REPORTS.map(
+    (report) => `
+      <a class="report-card" href="${escapeHtml(report.href)}" download>
+        <span>${escapeHtml(report.period)}</span>
+        <strong>${escapeHtml(report.title)}</strong>
+        <small>${escapeHtml(report.type)} · 下载</small>
+      </a>
+    `,
+  ).join("");
+}
+
 function renderTrades() {
   $("#tradesBody").innerHTML = DATA.recentTrades
     .slice(0, 28)
@@ -597,7 +917,10 @@ function renderApp() {
   $("#clientTitle").textContent = `${context.name} · ${context.id}`;
   renderVip(context);
   renderClientSelect();
+  renderWealthHero(context);
+  renderAssetOverview(context);
   renderKpis(context);
+  renderAssetIncome(context);
   renderMarketSummary(context);
   renderNavChart();
   renderClientList(context);
@@ -606,6 +929,8 @@ function renderApp() {
   renderDividends(context);
   renderLots(context);
   renderAnonymousSubscriptions();
+  renderHoldingDetails(context);
+  renderReports();
   renderTrades();
   renderAssumptions();
 }
@@ -663,16 +988,26 @@ function bindEvents() {
   $("#holdingSearch").addEventListener("input", (event) => {
     state.search = event.target.value;
     renderHoldings(currentContext());
+    renderHoldingDetails(currentContext());
   });
 
   $("#sortSelect").addEventListener("change", (event) => {
     state.sort = event.target.value;
     renderHoldings(currentContext());
+    renderHoldingDetails(currentContext());
   });
 
   $("#autoRefreshToggle").addEventListener("change", (event) => {
     state.autoRefresh = event.target.checked;
     syncAutoRefresh();
+  });
+
+  $$("[data-range]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.assetRange = button.dataset.range;
+      $$("[data-range]").forEach((item) => item.classList.toggle("active", item === button));
+      if (DATA) renderAssetIncome(currentContext());
+    });
   });
 }
 
