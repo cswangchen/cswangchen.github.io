@@ -129,14 +129,14 @@ td,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 132px;
-  height: 58px;
+  width: 188px;
+  height: 72px;
   overflow: hidden;
 }
 
 .logo-crop.small {
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
   border-radius: 8px;
   background: #fff;
 }
@@ -1240,7 +1240,7 @@ td,
 
 .top-holdings-strip {
   display: grid;
-  grid-template-columns: repeat(10, minmax(150px, 1fr));
+  grid-template-columns: repeat(10, minmax(184px, 1fr));
   gap: 12px;
   margin-bottom: 18px;
   overflow-x: auto;
@@ -1248,7 +1248,7 @@ td,
 }
 
 .holding-logo-card {
-  min-width: 150px;
+  min-width: 184px;
   display: grid;
   gap: 10px;
   padding: 14px;
@@ -1272,28 +1272,37 @@ td,
 
 .company-logo {
   position: relative;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
+  width: 104px;
+  height: 44px;
+  flex: 0 0 104px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
   overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--navy), var(--emerald));
-  color: #fff;
+  background: #fff;
+  color: var(--navy);
   font-size: 13px;
   font-weight: 900;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05);
 }
 
 .company-logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background: #fff;
+  position: absolute;
+  inset: 4px;
+  z-index: 1;
+  width: calc(100% - 8px);
+  height: calc(100% - 8px);
+  object-fit: contain;
 }
 
 .company-logo img.is-missing {
   display: none;
+}
+
+.company-logo img:not(.is-missing) + span {
+  opacity: 0;
 }
 
 .rank-badge {
